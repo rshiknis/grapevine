@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './firebase/config';
+import { auth } from './firebase/config'; // Import Firebase auth instance
 import styles from './LoginScreen.styles';
 
 export default function LoginScreen() {
@@ -29,12 +29,13 @@ export default function LoginScreen() {
         setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            router.replace('/home');
+            router.replace('/preferences'); // Navigate to home after login
         } catch (error) {
+            console.log(error);
             let errorMessage = 'An error occurred';
             if (error.code === 'auth/user-not-found') {
                 errorMessage = 'No account found with this email';
-            } else if (error.code === 'auth/wrong-password') {
+            } else if (error.code === 'auth/invalid-credential') {
                 errorMessage = 'Invalid password';
             } else if (error.code === 'auth/invalid-email') {
                 errorMessage = 'Invalid email address';
@@ -82,9 +83,7 @@ export default function LoginScreen() {
                         style={styles.eyeIcon}
                         disabled={loading}
                     >
-                        <Text style={styles.eyeIconText}>
-                            {showPassword ? '👁️' : '👁️'}
-                        </Text>
+                        <Text style={styles.eyeIconText}>👁️</Text>
                     </TouchableOpacity>
                 </View>
 
