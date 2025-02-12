@@ -8,7 +8,8 @@ const firebaseConfig = {
   projectId: "grapevine-71a7c",
   storageBucket: "grapevine-71a7c.firebasestorage.app",
   messagingSenderId: "808409879489",
-  appId: "1:808409879489:web:29a8dd0435f630ec319540"
+  appId: "1:808409879489:web:29a8dd0435f630ec319540",
+  databaseURL: "https://grapevine-71a7c-default-rtdb.firebaseio.com/"
 };
 
 const app = initializeApp(firebaseConfig);

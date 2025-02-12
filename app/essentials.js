@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getDatabase, ref, set } from 'firebase/database'; // Import Firebase Realtime Database functions
-import { auth } from './firebase/config'; // Import Firebase auth instance
+import { getDatabase, ref, set } from 'firebase/database';
+import { auth } from './firebase/config';
 
-export default function PreferencesScreen() {
+export default function EssentialsScreen() {
     const router = useRouter();
-    const [age, setAge] = useState('');
-    const [gender, setGender] = useState('');
-    const [phone, setPhone] = useState('');
+    const [university, setUniversity] = useState('');
+    const [location, setLocation] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleSavePreferences = async () => {
-        if (!age || !gender || !phone) {
+    const handleSaveEssentials = async () => {
+        if (!university || !location) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
@@ -20,24 +19,23 @@ export default function PreferencesScreen() {
         setLoading(true);
         try {
             const db = getDatabase();
-            const userId = auth.currentUser?.uid; // Get the logged-in user ID
+            const userId = auth.currentUser?.uid;
 
             if (!userId) {
                 throw new Error('User not logged in');
             }
 
-            // Save user preferences to Firebase Realtime Database
-            await set(ref(db, `users/${userId}/preferences`), {
-                age,
-                gender,
-                phone,
+            // Save essentials to Firebase
+            await set(ref(db, `users/${userId}/essentials`), {
+                university,
+                location,
             });
 
-            Alert.alert('Success', 'Preferences saved!');
-            router.push('/essentials'); // Navigate to home or another screen
+            Alert.alert('Success', 'Details saved!');
+            router.replace('/personal-preferences'); // Navigate to home or next screen
         } catch (error) {
             console.error(error);
-            Alert.alert('Error', 'Could not save preferences. Please try again.');
+            Alert.alert('Error', 'Could not save details. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -45,37 +43,27 @@ export default function PreferencesScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Let's get to know you...</Text>
+            <Text style={styles.title}>Now the essentials...</Text>
 
-            <Text style={styles.label}>Choose your age</Text>
+            <Text style={styles.label}>Choose your university</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Enter your age"
-                keyboardType="numeric"
-                value={age}
-                onChangeText={setAge}
+                placeholder="Enter University"
+                value={university}
+                onChangeText={setUniversity}
             />
 
-            <Text style={styles.label}>Select your gender</Text>
+            <Text style={styles.label}>Where will you be moving to?</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Enter your gender"
-                value={gender}
-                onChangeText={setGender}
-            />
-
-            <Text style={styles.label}>Your phone number</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your phone number"
-                keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
+                placeholder="Enter Location"
+                value={location}
+                onChangeText={setLocation}
             />
 
             <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}
-                onPress={handleSavePreferences}
+                onPress={handleSaveEssentials}
                 disabled={loading}
             >
                 <Text style={styles.buttonText}>{loading ? 'Saving...' : 'Next'}</Text>
@@ -87,7 +75,7 @@ export default function PreferencesScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#B69191', // Matching theme color
+        backgroundColor: '#B69191',
         padding: 20,
         justifyContent: 'center',
     },

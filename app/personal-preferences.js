@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getDatabase, ref, set } from 'firebase/database'; // Import Firebase Realtime Database functions
-import { auth } from './firebase/config'; // Import Firebase auth instance
+import { getDatabase, ref, update } from 'firebase/database';
+import { auth } from './firebase/config';
 
-export default function PreferencesScreen() {
+export default function PersonalScreen() {
     const router = useRouter();
-    const [age, setAge] = useState('');
-    const [gender, setGender] = useState('');
-    const [phone, setPhone] = useState('');
+    const [interests, setInterests] = useState('');
+    const [roommate, setRoommate] = useState('');
+    const [work, setWork] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleSavePreferences = async () => {
-        if (!age || !gender || !phone) {
+    const handleSavePersonalInfo = async () => {
+        if (!interests || !roommate || !work) {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
@@ -20,24 +20,24 @@ export default function PreferencesScreen() {
         setLoading(true);
         try {
             const db = getDatabase();
-            const userId = auth.currentUser?.uid; // Get the logged-in user ID
+            const userId = auth.currentUser?.uid;
 
             if (!userId) {
                 throw new Error('User not logged in');
             }
 
-            // Save user preferences to Firebase Realtime Database
-            await set(ref(db, `users/${userId}/preferences`), {
-                age,
-                gender,
-                phone,
+            // Save personal details to Firebase
+            await update(ref(db, `users/${userId}`), {
+                interests,
+                roommate,
+                work
             });
 
-            Alert.alert('Success', 'Preferences saved!');
-            router.push('/essentials'); // Navigate to home or another screen
+            Alert.alert('Success', 'Personal details saved!');
+            router.push('/discover'); // Navigate to the discover page
         } catch (error) {
             console.error(error);
-            Alert.alert('Error', 'Could not save preferences. Please try again.');
+            Alert.alert('Error', 'Could not save details. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -45,37 +45,40 @@ export default function PreferencesScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Let's get to know you...</Text>
+            <Text style={styles.title}>
+                A bit more <Text style={styles.underline}>personal...</Text>
+            </Text>
+            <Text style={styles.subtitle}>
+                Optional, but we recommend filling these out for a better experience
+            </Text>
 
-            <Text style={styles.label}>Choose your age</Text>
+            <Text style={styles.label}>Interests</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Enter your age"
-                keyboardType="numeric"
-                value={age}
-                onChangeText={setAge}
+                placeholder="Enter Interests (e.g., Music, Gaming)"
+                value={interests}
+                onChangeText={setInterests}
             />
 
-            <Text style={styles.label}>Select your gender</Text>
+            <Text style={styles.label}>Looking for a roommate?</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Enter your gender"
-                value={gender}
-                onChangeText={setGender}
+                placeholder="Yes or No"
+                value={roommate}
+                onChangeText={setRoommate}
             />
 
-            <Text style={styles.label}>Your phone number</Text>
+            <Text style={styles.label}>What will you do for work?</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Enter your phone number"
-                keyboardType="phone-pad"
-                value={phone}
-                onChangeText={setPhone}
+                placeholder="Enter job type (e.g., Full-time, Part-time)"
+                value={work}
+                onChangeText={setWork}
             />
 
             <TouchableOpacity
                 style={[styles.button, loading && styles.buttonDisabled]}
-                onPress={handleSavePreferences}
+                onPress={handleSavePersonalInfo}
                 disabled={loading}
             >
                 <Text style={styles.buttonText}>{loading ? 'Saving...' : 'Next'}</Text>
@@ -87,13 +90,21 @@ export default function PreferencesScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#B69191', // Matching theme color
+        backgroundColor: '#B69191',
         padding: 20,
         justifyContent: 'center',
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
+        color: '#000',
+        marginBottom: 5,
+    },
+    underline: {
+        textDecorationLine: 'underline',
+    },
+    subtitle: {
+        fontSize: 14,
         color: '#000',
         marginBottom: 20,
     },

@@ -37,7 +37,7 @@ export default function SignUp() {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
             Alert.alert('Success', 'Account created successfully!');
-            router.replace('/preferences'); // Navigate to home screen
+            router.replace('/login'); // Navigate to login screen
         } catch (error) {
             console.log(error)
             let errorMessage = 'An error occurred';
